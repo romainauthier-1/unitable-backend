@@ -1,6 +1,7 @@
 const request = require("supertest");
 const app = require("./app");
 const mongoose = require("mongoose");
+const User = require("./models/users");
 
 it("POST /employee | Ajout employé.e en BDD", async () => {
   const michelle = {
@@ -72,5 +73,7 @@ it("POST /employee | Ajout employé.e en BDD", async () => {
 }, 10000);
 
 afterAll(async () => {
+  // nettoyage des employés créés par le test
+  await User.deleteMany({ email: { $in: ["m.obama@usa.us", "queenB@usa.us"] } });
   await mongoose.connection.close();
 });

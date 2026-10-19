@@ -110,20 +110,4 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
-  try {
-    const service = await Service.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-
-    if (!service) {
-      return res.json({ result: false, message: "Service non trouvé" });
-    }
-
-    res.json({ result: true, message: "Service modifié avec succès", service });
-  } catch (err) {
-    res.json({ result: false, message: err.message });
-  }
-});
-
 module.exports = router;

@@ -13,7 +13,9 @@ router.get("/", function (req, res, next) {
 });
 // route get pour chercher tous les users
 router.get("/search/all", (req, res) => {
-	User.find().then((data) => {
+	User.find()
+		.select("-password")
+		.then((data) => {
 		if (data) {
 			res.json({ result: true, users: data });
 		} else {
@@ -25,7 +27,9 @@ router.get("/search/all", (req, res) => {
 router.get("/search/by/:email", (req, res) => {
 	//const email = req.params.email;
 	const email = decodeURIComponent(req.params.email).trim().toLowerCase();
-	User.findOne({ email }).then((data) => {
+	User.findOne({ email })
+		.select("-password")
+		.then((data) => {
 		if (data) {
 			res.json({ result: true, user: data });
 		} else {
@@ -68,7 +72,7 @@ router.put("/organization", async (req, res) => {
 	if (!email || !organizationId) {
 		//add status 400 pour bad request
 
-		return res.status(400).res.json({
+		return res.status(400).json({
 			result: false,
 			error: "Missing email or organization",
 		});
@@ -174,7 +178,7 @@ router.get("/:email", async (req, res) => {
 	const { email } = req.params;
 
 	try {
-		const user = await User.findOne({ email });
+		const user = await User.findOne({ email }).select("-password");
 
 		if (!user) {
 			return res.status(404).json({
