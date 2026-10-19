@@ -10,7 +10,7 @@ const bcrypt = require("bcrypt");
 router.get("/:organizationId", async (req, res) => {
 	const { organizationId } = req.params;
 	try {
-		const employees = await User.find({ organization: organizationId });
+		const employees = await User.find({ organization: organizationId }).select("-password");
 		res.json({ result: true, employees });
 	} catch (error) {
 		console.error("ERREUR GET EMPLOYEE:", error.message);
@@ -84,11 +84,12 @@ router.post("/", async (req, res) => {
 		});
 
 		const savedEmployee = await newEmployee.save();
+		const { password: _, ...employeeWithoutPassword } = savedEmployee.toObject();
 
 		res.status(201).json({
 			result: true,
 			message: "Employee created successfully",
-			employee: savedEmployee,
+			employee: employeeWithoutPassword,
 			tempPassword,
 		});
 	} catch (error) {
@@ -105,7 +106,9 @@ router.post("/", async (req, res) => {
 // DELETE /employee/:id
 router.delete("/:id", async (req, res) => {
 	try {
-		const employee = await User.findByIdAndDelete(req.params.id);
+		const employee = await User.findByIdAndDelete(req.params.id).select(
+			"-password",
+		);
 
 		if (!employee) {
 			return res
@@ -131,7 +134,7 @@ router.put("/:id", async (req, res) => {
 			req.params.id,
 			req.body,
 			{ new: true },
-		);
+		).select("-password");
 
 		res.json({
 			result: true,
